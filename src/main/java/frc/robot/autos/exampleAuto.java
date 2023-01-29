@@ -5,6 +5,11 @@ import frc.robot.subsystems.Swerve;
 
 import java.util.List;
 
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -25,13 +30,14 @@ public class exampleAuto extends SequentialCommandGroup {
                     Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared)
                 .setKinematics(Constants.Swerve.swerveKinematics);
 
-        // An example trajectory to follow.  All units in meters.
+        PathPlannerTrajectory newExample = PathPlanner.loadPath("New New Path", new PathConstraints(3, 3));
+                // An example trajectory to follow.  All units in meters.
         Trajectory exampleTrajectory =
             TrajectoryGenerator.generateTrajectory(
                 // Start at the origin facing the +X direction
                 new Pose2d(0, 0, new Rotation2d(0)),
                 // Pass through these two interior waypoints, making an 's' curve path
-                List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+                List.of(new Translation2d(1, 0.5), new Translation2d(2, -0.5)),
                 // End 3 meters straight ahead of where we started, facing forward
                 new Pose2d(3, 0, new Rotation2d(0)),
                 config);
@@ -41,15 +47,17 @@ public class exampleAuto extends SequentialCommandGroup {
                 Constants.AutoConstants.kPThetaController, 0, 0, Constants.AutoConstants.kThetaControllerConstraints);
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-        SwerveControllerCommand swerveControllerCommand =
-            new SwerveControllerCommand(
-                exampleTrajectory,
+        PPSwerveControllerCommand swerveControllerCommand = //new PPSwerveControllerCommand(newExample, s_Swerve::getPose, new PIDController(Constants.AutoConstants.kPXController, 0, 0), new PIDController(Constants.AutoConstants.kPYController, 0, 0), null, null, null) ; 
+             new PPSwerveControllerCommand(
+                newExample,
                 s_Swerve::getPose,
                 Constants.Swerve.swerveKinematics,
                 new PIDController(Constants.AutoConstants.kPXController, 0, 0),
                 new PIDController(Constants.AutoConstants.kPYController, 0, 0),
-                thetaController,
+                new PIDController(Constants.AutoConstants.kPThetaController, 0, 0),
+                //thetaController,
                 s_Swerve::setModuleStates,
+                true,
                 s_Swerve);
 
 
