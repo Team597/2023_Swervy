@@ -55,7 +55,6 @@ public class exampleAuto extends SequentialCommandGroup {
                 new PIDController(Constants.AutoConstants.kPXController, 0, 0),
                 new PIDController(Constants.AutoConstants.kPYController, 0, 0),
                 new PIDController(Constants.AutoConstants.kPThetaController, 0, 0),
-                //thetaController,
                 s_Swerve::setModuleStates,
                 true,
                 s_Swerve);
