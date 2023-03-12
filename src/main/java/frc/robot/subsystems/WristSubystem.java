@@ -71,7 +71,7 @@ public class WristSubystem extends SubsystemBase {
     motor.config_kD(kSlotIdx, 250.0, kTimeoutMs);
 
     /* Set acceleration and vcruise velocity - see documentation */
-    motor.configMotionCruiseVelocity(30000, kTimeoutMs);//35000
-    motor.configMotionAcceleration(1000, kTimeoutMs);//20000
+    motor.configMotionCruiseVelocity(30000, kTimeoutMs);//30000
+    motor.configMotionAcceleration(800, kTimeoutMs);//1000
   }
 }

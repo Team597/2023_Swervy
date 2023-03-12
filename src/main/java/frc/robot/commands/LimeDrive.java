@@ -4,45 +4,48 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.Constants;
+import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.Swerve;
 
-public class DriveIntake extends CommandBase {
-  private IntakeSubsystem intake;
-  private double power;
-
-  /** Creates a new DriveIntake. */
-  public DriveIntake(IntakeSubsystem w_Intake, double w_Power) {
+public class LimeDrive extends CommandBase {
+  private Limelight lime;
+  private Swerve swerve;
+  /** Creates a new LimeDrive. */
+  public LimeDrive(Limelight w_Lime, Swerve w_Swerve) {
     // Use addRequirements() here to declare subsystem dependencies.
-    intake = w_Intake;
-    power = w_Power;
+    lime = w_Lime;
+    swerve = w_Swerve;
 
-    addRequirements(intake);
+    addRequirements(swerve);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(intake.intakeMode()=="Cube" && power<=0){
-      power *= 0.25;
-    }
-    intake.driveIntake(power);
+    double strafe = -(lime.getX()/27);
+    
+    swerve.drive(new Translation2d(0.0, strafe).times(Constants.Swerve.maxSpeed), 0, true, true);
+
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    intake.driveIntake(0);
+
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    //intake.driveIntake(0);
     return false;
   }
 }

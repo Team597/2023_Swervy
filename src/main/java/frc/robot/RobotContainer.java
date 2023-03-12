@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
+import frc.robot.Constants.Positions;
 import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -34,7 +35,7 @@ public class RobotContainer {
     /* Driver Buttons */
     private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
     private final JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
-
+    private final JoystickButton limeButton = new JoystickButton(driver, XboxController.Button.kA.value);
 
     /* Co-Driver Buttons */
     private final GamepadAxisButton intakePiece = new GamepadAxisButton(this::axisLeftCheck);
@@ -53,17 +54,23 @@ public class RobotContainer {
     private final POVButton midPickup2 = new POVButton(codriver, 90);
     private final POVButton highPickup = new POVButton(codriver, 0);
 
+    private final JoystickButton manualWrist = new JoystickButton(codriver, XboxController.Button.kBack.value);
+    private final JoystickButton manualElevator = new JoystickButton(codriver, XboxController.Button.kStart.value);
+
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
     private final ElevatorSubsystem s_Elevator = new ElevatorSubsystem();
     private final IntakeSubsystem s_Intake = new IntakeSubsystem();
     private final WristSubystem s_Wrist = new WristSubystem();
+    private final Limelight s_Limelight = new Limelight();
 
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
-        s_Wrist.setDefaultCommand(new DriveWrist(s_Wrist, () -> -codriver.getRawAxis(wristAxis)));
-       s_Elevator.setDefaultCommand(new DriveElevator(s_Elevator, () -> -codriver.getRawAxis(eleAxis)));
+        s_Wrist.setDefaultCommand(new MagicWrist(s_Wrist, Positions.wHome));
+        s_Elevator.setDefaultCommand(new MagicElevator(s_Elevator, Positions.eHome));
+        //s_Wrist.setDefaultCommand(new DriveWrist(s_Wrist, () -> -codriver.getRawAxis(wristAxis)));
+       // s_Elevator.setDefaultCommand(new DriveElevator(s_Elevator, () -> -codriver.getRawAxis(eleAxis)));
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
                 s_Swerve, 
@@ -87,11 +94,22 @@ public class RobotContainer {
     private void configureButtonBindings() {
         /* Driver Buttons */
         zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
+        limeButton.whileTrue(new LimeDrive(s_Limelight, s_Swerve));
+        limeButton.onFalse(new TeleopSwerve(
+            s_Swerve, 
+            () -> driver.getRawAxis(translationAxis), 
+            () -> driver.getRawAxis(strafeAxis), 
+            () -> -driver.getRawAxis(rotationAxis), 
+            () -> robotCentric.getAsBoolean()
+        ));
        
 
         /* CoDriver Buttons */
-        intakePiece.whileTrue(new DriveIntake(s_Intake,-1.0));
-        outtakePiece.whileTrue(new DriveIntake(s_Intake,1.0));
+        manualWrist.onTrue(new DriveWrist(s_Wrist, () -> -codriver.getRawAxis(wristAxis)));
+        manualElevator.onTrue(new DriveElevator(s_Elevator, () -> -codriver.getRawAxis(eleAxis)));
+
+        intakePiece.whileTrue(new DriveIntake(s_Intake,1.0));
+        outtakePiece.whileTrue(new DriveIntake(s_Intake,-1.0));
 
         coneMode.onTrue(new IntakeSolenoid(s_Intake, true));
         cubeMode.onTrue(new IntakeSolenoid(s_Intake, false));

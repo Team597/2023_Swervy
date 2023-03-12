@@ -18,7 +18,7 @@ public final class Constants {
         
         public static final double
             wHome = wBothGround - 1385,
-            eHome = 1360,
+            eHome = 720,
             wConeGroundPick = wBothGround + 130,
             eConeGroundPick = 88613,
 

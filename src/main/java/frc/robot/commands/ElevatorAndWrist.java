@@ -62,6 +62,13 @@ public class ElevatorAndWrist extends ParallelCommandGroup {
                 break;
     }
     
-    addCommands(new MagicElevator(ele, elePos), new MagicWrist(wrist, wristPos));
+    double timeDelay = 0;
+    if(pose!= 0){
+      timeDelay = 0.1;
+    } else {
+      timeDelay = 0.0;
+    }
+
+    addCommands(new MagicElevator(ele, elePos), new WaitMagicWrist(timeDelay, wrist, wristPos));
   }
 }
