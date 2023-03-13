@@ -12,6 +12,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Positions;
 import frc.robot.Constants.Wrist;
 
 public class WristSubystem extends SubsystemBase {
@@ -24,6 +25,8 @@ public class WristSubystem extends SubsystemBase {
     wristTalon.setNeutralMode(NeutralMode.Brake);
     wristTalon.setInverted(true);
     wristTalon.setSensorPhase(true);
+    wristTalon.configReverseSoftLimitEnable(true);
+    wristTalon.configReverseSoftLimitThreshold(1024);
   }
 
   @Override
@@ -35,7 +38,42 @@ public class WristSubystem extends SubsystemBase {
     wristTalon.set(ControlMode.PercentOutput, power);
   }
 
-  public void magicWrist(double target){
+
+//I hate command based coding
+  public void magicset(int pose, boolean isBox){
+    double target = Positions.wHome;
+    switch(pose){
+      case 1:   target = Positions.wBothGround;//GROUND PICK UP
+                break;
+      case 2:   if(!isBox){ //CONE UPRIGHT GROUD PICK UP
+                  target = Positions.wConeGroundPick;
+                } else {
+                  target = Positions.wBothGround;
+                }
+                break;
+      case 3:   if(!isBox){ // DUAL SUBSTATION PICK UP
+                  target = Positions.wConeSubPick;
+                } else {
+                  target = Positions.wCubeSubPick;
+                }
+                break;
+      case 4:   if(!isBox){//MID SCORE
+                  target = Positions.wConeMidScore;
+                } else {
+                  target = Positions.wCubeMidScore;
+                }
+                break;
+      case 5:   if(!isBox){//HIGH SCORE
+                  target = Positions.wConeHighScore;
+                } else {
+                  target = Positions.wCubeHighScore;
+                }
+                break;
+      default:  target = Positions.wHome;
+                break;
+    }
+
+    SmartDashboard.putNumber("Wrist Target", target);
     wristTalon.set(ControlMode.MotionMagic, target);
   }
 
@@ -67,7 +105,7 @@ public class WristSubystem extends SubsystemBase {
     motor.selectProfileSlot(kSlotIdx, kPIDLoopIdx);
     motor.config_kF(kSlotIdx, 0.0, kTimeoutMs);
     motor.config_kP(kSlotIdx, 4.0, kTimeoutMs);
-    motor.config_kI(kSlotIdx, 0.000025, kTimeoutMs);//0.00005
+    motor.config_kI(kSlotIdx, 0.00001, kTimeoutMs);//0.000025
     motor.config_kD(kSlotIdx, 250.0, kTimeoutMs);
 
     /* Set acceleration and vcruise velocity - see documentation */

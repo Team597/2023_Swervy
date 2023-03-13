@@ -41,13 +41,12 @@ public class IntakeSubsystem extends SubsystemBase{
     @Override
     public void periodic() {
     // This method will be called once per scheduler run
-       // double intakeCurrent = pdh.getCurrent(5);
-    
         SmartDashboard.putString("Intaking", mode);
-        //SmartDashboard.putNumber("Intake Draw", intakeCurrent);
     }
 
     public void driveIntake(double power){
+        double intakeCurrent = pdh.getCurrent(5);
+        SmartDashboard.putNumber("Intake Draw", intakeCurrent);
         intakeTalon.set(ControlMode.PercentOutput, power);
     }
 
@@ -63,6 +62,23 @@ public class IntakeSubsystem extends SubsystemBase{
         }
     }
 
+    public boolean isBox(){
+        if (mode=="Cone"){
+            return false;
+        } else if(mode == "Box"){
+            return true;
+        }
+        return false;
+    }
+    public double intakeDouble(){
+        double returny = 0.0;
+        if (mode=="Cone"){
+            returny = 0.0;
+        } else if(mode == "Box"){
+            returny = 1.0;
+        }
+        return returny;
+    }
     public String intakeMode(){
         return mode;
     }

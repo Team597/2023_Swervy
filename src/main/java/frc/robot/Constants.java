@@ -13,27 +13,28 @@ import frc.lib.util.SwerveModuleConstants;
 public final class Constants {
     public static final double stickDeadband = 0.1;
     public static final class Positions{
-        public static final double wBothGround = 2570;
+        public static final double wBothGround = 3120;
         
         
         public static final double
-            wHome = wBothGround - 1385,
+            wHome = wBothGround - 1725,//1385
             eHome = 720,
-            wConeGroundPick = wBothGround + 130,
-            eConeGroundPick = 88613,
+            wConeGroundPick = wBothGround + 90,
+            eConeGroundPick = 69343,
 
             wConeSubPick = wBothGround + 130,//THIS SECTION NEEDS NUMBERS
             eConeSubPick = 310438,
             wCubeSubPick = wBothGround + 130,
             eCubeSubPick = 310438,
 
-            wConeMidScore = wBothGround - 40,
-            wCubeMidScore = wBothGround - 40,
-            eMidScore = 310438,
+            wConeMidScore = wBothGround - 440,
+            wCubeMidScore = wBothGround - 1220,
+            eMidScore = 231000,
             
-            wConeHighScore = wBothGround + 69,
-            wCubeHighScore = wBothGround + 69,
-            eHighScore = 403169;
+            wConeHighScore = wBothGround - 340,
+            wCubeHighScore = wBothGround - 1220,
+            eBoxHighScore = 139300,
+            eHighScore = 331300;
             
     }
     

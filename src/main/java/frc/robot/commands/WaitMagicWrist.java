@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.WristSubystem;
@@ -13,9 +15,9 @@ import frc.robot.subsystems.WristSubystem;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class WaitMagicWrist extends SequentialCommandGroup {
   /** Creates a new WaitMagicWrist. */
-  public WaitMagicWrist(double time, WristSubystem w_Wrist, double w_Position) {
+  public WaitMagicWrist(double time, WristSubystem w_Wrist, int w_Position, BooleanSupplier w_isBox) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    addCommands(new WaitCommand(time), new MagicWrist(w_Wrist, w_Position));
+    addCommands(new WaitCommand(time), new MagicWrist(w_Wrist, w_Position, w_isBox));
   }
 }

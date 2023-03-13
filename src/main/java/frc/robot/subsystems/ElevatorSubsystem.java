@@ -13,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Elevator;
+import frc.robot.Constants.Positions;
 
 public class ElevatorSubsystem extends SubsystemBase {
   private TalonFX elevatorFX;
@@ -32,12 +33,50 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
 
   public void set(double power){
+    if(elevatorFX.getSelectedSensorPosition()<=1200 && power < 0){
+      power = 0;
+    }
     elevatorFX.set(ControlMode.PercentOutput, power);
   }
   public void stop(){
     elevatorFX.set(ControlMode.PercentOutput,0);
   }
-  public void magicset(double target){
+
+  //I hate command code
+  public void magicset(int pose, Boolean isBox){
+    double target = 0.0;
+    switch(pose){
+        case 1:   target = Positions.eHome;//GROUND PICK UP
+                  break;
+        case 2:   if(!isBox){ //CONE UPRIGHT GROUD PICK UP
+                    target = Positions.eConeGroundPick;
+                  } else {
+                    target = Positions.eHome;
+                  }
+                  break;
+        case 3:   if(!isBox){ // DUAL SUBSTATION PICK UP
+                    target = Positions.eConeSubPick;
+                  } else {
+                    target = Positions.eCubeSubPick;
+                  }
+                  break;
+        case 4:   if(!isBox){//MID SCORE
+                    target = Positions.eMidScore;
+                  } else {
+                    target = Positions.eHome;
+                  }
+                  break;
+        case 5:   if(!isBox){//HIGH SCORE
+                    target = Positions.eHighScore;
+                  } else {
+                    target = Positions.eBoxHighScore;
+                  }
+                  break;
+        default:  target = Positions.eHome;
+                  break;
+            }
+    
+    SmartDashboard.putNumber("Elevator Target", target);
     elevatorFX.set(ControlMode.MotionMagic,target);
   }
 

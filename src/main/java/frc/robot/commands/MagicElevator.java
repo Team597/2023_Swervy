@@ -4,20 +4,22 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ElevatorSubsystem;
 
 public class MagicElevator extends CommandBase {
 
   private ElevatorSubsystem elevator;
-  private double elevatorPosition;
+  private int elevatorPosition;
+  private BooleanSupplier intakeMode; 
 
   /** Creates a new MagicElevator. */
-  public MagicElevator(ElevatorSubsystem eleSub, double pose) {
+  public MagicElevator(ElevatorSubsystem eleSub, int pose, BooleanSupplier iMode) {
     this.elevator = eleSub;
     this.elevatorPosition = pose;
-
+    this.intakeMode = iMode;
     addRequirements(elevator);
   }
 
@@ -28,8 +30,7 @@ public class MagicElevator extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    SmartDashboard.putNumber("Elevator Target", elevatorPosition);
-    elevator.magicset(elevatorPosition);
+    elevator.magicset(elevatorPosition, intakeMode.getAsBoolean());
   }
 
   // Called once the command ends or is interrupted.

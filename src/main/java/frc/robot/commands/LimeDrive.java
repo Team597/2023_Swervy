@@ -33,7 +33,7 @@ public class LimeDrive extends CommandBase {
   public void execute() {
     double strafe = -(lime.getX()/27);
     
-    swerve.drive(new Translation2d(0.0, strafe).times(Constants.Swerve.maxSpeed), 0, true, true);
+    swerve.drive(new Translation2d(0.0, strafe).times(Constants.Swerve.maxSpeed), 0, false, true);
 
   }
 

@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
-import frc.robot.Constants.Positions;
 import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -67,10 +66,10 @@ public class RobotContainer {
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
-        s_Wrist.setDefaultCommand(new MagicWrist(s_Wrist, Positions.wHome));
-        s_Elevator.setDefaultCommand(new MagicElevator(s_Elevator, Positions.eHome));
-        //s_Wrist.setDefaultCommand(new DriveWrist(s_Wrist, () -> -codriver.getRawAxis(wristAxis)));
-       // s_Elevator.setDefaultCommand(new DriveElevator(s_Elevator, () -> -codriver.getRawAxis(eleAxis)));
+        //s_Wrist.setDefaultCommand(new MagicWrist(s_Wrist, Positions.wHome));
+        //s_Elevator.setDefaultCommand(new MagicElevator(s_Elevator, Positions.eHome));
+        s_Wrist.setDefaultCommand(new DriveWrist(s_Wrist, () -> -codriver.getRawAxis(wristAxis)));
+        s_Elevator.setDefaultCommand(new DriveElevator(s_Elevator, () -> -codriver.getRawAxis(eleAxis)));
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
                 s_Swerve, 
@@ -97,8 +96,8 @@ public class RobotContainer {
         limeButton.whileTrue(new LimeDrive(s_Limelight, s_Swerve));
         limeButton.onFalse(new TeleopSwerve(
             s_Swerve, 
-            () -> driver.getRawAxis(translationAxis), 
-            () -> driver.getRawAxis(strafeAxis), 
+            () -> -driver.getRawAxis(translationAxis), 
+            () -> -driver.getRawAxis(strafeAxis), 
             () -> -driver.getRawAxis(rotationAxis), 
             () -> robotCentric.getAsBoolean()
         ));
@@ -115,30 +114,30 @@ public class RobotContainer {
         cubeMode.onTrue(new IntakeSolenoid(s_Intake, false));
 
         groundPickup.debounce(0.1)
-            .onTrue(new ElevatorAndWrist(s_Elevator, s_Wrist, s_Intake, 1))
-            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist, s_Intake, 0));
-        midPickup1
-            .onTrue(new ElevatorAndWrist(s_Elevator, s_Wrist, s_Intake, 2))
-            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist, s_Intake, 0));
-        midPickup2
-            .onTrue(new ElevatorAndWrist(s_Elevator, s_Wrist, s_Intake, 2))
-            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist, s_Intake, 0));
-        highPickup
-            .onTrue(new ElevatorAndWrist(s_Elevator, s_Wrist, s_Intake, 3))
-            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist, s_Intake, 0));
+            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist, () -> s_Intake.isBox(), 1))
+            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
+        midPickup1.debounce(0.1)
+            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 2))
+            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
+        midPickup2.debounce(0.1)
+            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 2))
+            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
+        highPickup.debounce(0.1)
+            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 3))
+            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
 
-        lowScore
-            .onTrue(new ElevatorAndWrist(s_Elevator, s_Wrist, s_Intake, 1))
-            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist, s_Intake, 0));
-        midScore1
-            .onTrue(new ElevatorAndWrist(s_Elevator, s_Wrist, s_Intake, 4))
-            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist, s_Intake, 0));
-        midScore2
-            .onTrue(new ElevatorAndWrist(s_Elevator, s_Wrist, s_Intake, 4))
-            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist, s_Intake, 0));
-        highScore
-            .onTrue(new ElevatorAndWrist(s_Elevator, s_Wrist, s_Intake, 5))
-            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist, s_Intake, 0));
+        lowScore.debounce(0.1)
+            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 1))
+            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
+        midScore1.debounce(0.1)
+            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 4))
+            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
+        midScore2.debounce(0.1)
+            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 4))
+            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
+        highScore.debounce(0.1)
+            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 5))
+            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
     }
 
     /**

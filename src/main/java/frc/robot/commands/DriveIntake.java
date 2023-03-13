@@ -28,7 +28,7 @@ public class DriveIntake extends CommandBase {
   @Override
   public void execute() {
     if(intake.intakeMode()=="Cube" && power<=0){
-      power *= 0.25;
+      power *= 0.2;
     }
     intake.driveIntake(power);
   }
