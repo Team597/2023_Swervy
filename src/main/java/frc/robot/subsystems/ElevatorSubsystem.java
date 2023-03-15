@@ -60,13 +60,19 @@ public class ElevatorSubsystem extends SubsystemBase {
                     target = Positions.eCubeSubPick;
                   }
                   break;
-        case 4:   if(!isBox){//MID SCORE
+        case 4:   if(!isBox){//LOW SCORE
+                    target = Positions.eHome;
+                  } else {
+                    target = Positions.eHome;
+                  }
+                  break;
+        case 5:   if(!isBox){//MID SCORE
                     target = Positions.eMidScore;
                   } else {
                     target = Positions.eHome;
                   }
                   break;
-        case 5:   if(!isBox){//HIGH SCORE
+        case 6:   if(!isBox){//HIGH SCORE
                     target = Positions.eHighScore;
                   } else {
                     target = Positions.eBoxHighScore;

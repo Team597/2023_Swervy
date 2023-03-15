@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
+import frc.robot.Constants.Positions;
 import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -31,10 +32,15 @@ public class RobotContainer {
     private final int wristAxis = XboxController.Axis.kLeftY.value;
     private final int eleAxis = XboxController.Axis.kRightY.value;
 
+
     /* Driver Buttons */
     private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
     private final JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
     private final JoystickButton limeButton = new JoystickButton(driver, XboxController.Button.kA.value);
+
+    private final GamepadAxisButton turn0 = new GamepadAxisButton(this::driveraxisLeftCheck);
+    private final GamepadAxisButton turn180 = new GamepadAxisButton(this::driveraxisRightCheck);
+
 
     /* Co-Driver Buttons */
     private final GamepadAxisButton intakePiece = new GamepadAxisButton(this::axisLeftCheck);
@@ -66,10 +72,10 @@ public class RobotContainer {
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
-        //s_Wrist.setDefaultCommand(new MagicWrist(s_Wrist, Positions.wHome));
-        //s_Elevator.setDefaultCommand(new MagicElevator(s_Elevator, Positions.eHome));
-        s_Wrist.setDefaultCommand(new DriveWrist(s_Wrist, () -> -codriver.getRawAxis(wristAxis)));
-        s_Elevator.setDefaultCommand(new DriveElevator(s_Elevator, () -> -codriver.getRawAxis(eleAxis)));
+        s_Wrist.setDefaultCommand(new MagicWrist(s_Wrist, 0, () -> s_Intake.isBox()));
+        s_Elevator.setDefaultCommand(new MagicElevator(s_Elevator, 0, () -> s_Intake.isBox()));
+       // s_Wrist.setDefaultCommand(new DriveWrist(s_Wrist, () -> -codriver.getRawAxis(wristAxis)));
+        //s_Elevator.setDefaultCommand(new DriveElevator(s_Elevator, () -> -codriver.getRawAxis(eleAxis)));
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
                 s_Swerve, 
@@ -101,6 +107,17 @@ public class RobotContainer {
             () -> -driver.getRawAxis(rotationAxis), 
             () -> robotCentric.getAsBoolean()
         ));
+        turn0.whileTrue(new Rotate180(s_Swerve,
+         () -> -driver.getRawAxis(translationAxis),
+         () -> -driver.getRawAxis(strafeAxis),
+         0,
+         () -> robotCentric.getAsBoolean()));
+        
+        turn180.whileTrue(new Rotate180(s_Swerve,
+         () -> -driver.getRawAxis(translationAxis),
+         () -> -driver.getRawAxis(strafeAxis),
+         180,
+         () -> robotCentric.getAsBoolean()));
        
 
         /* CoDriver Buttons */
@@ -127,16 +144,16 @@ public class RobotContainer {
             .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
 
         lowScore.debounce(0.1)
-            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 1))
+            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 4))
             .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
         midScore1.debounce(0.1)
-            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 4))
+            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 5))
             .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
         midScore2.debounce(0.1)
-            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 4))
+            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 5))
             .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
         highScore.debounce(0.1)
-            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 5))
+            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 6))
             .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
     }
 
@@ -155,5 +172,13 @@ public class RobotContainer {
     }
     public boolean axisLeftCheck(){
         return Math.abs(codriver.getRawAxis(2)) > 0.5;
+    }
+
+
+    public boolean driveraxisRightCheck(){
+        return Math.abs(driver.getRawAxis(3)) > 0.5;
+    }
+    public boolean driveraxisLeftCheck(){
+        return Math.abs(driver.getRawAxis(2)) > 0.5;
     }
 }

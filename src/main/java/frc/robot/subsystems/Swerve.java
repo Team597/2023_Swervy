@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import frc.robot.SwerveModule;
+import frc.robot.NavX.AHRS;
 import frc.robot.Constants;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -8,7 +9,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 
-import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI.Port;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -42,6 +42,19 @@ public class Swerve extends SubsystemBase {
         resetModulesToAbsolute();
 
         swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getYaw(), getModulePositions());
+    }
+
+    public void gyroDrive(Translation2d translation, double desiredRotation, boolean fieldRelative, boolean isOpenLoop){
+        double currentAngle = gyro.getYaw();
+        if(currentAngle < 0 && desiredRotation == 180){
+            desiredRotation *= -1;
+        }
+        double angleOutput = desiredRotation - currentAngle;
+        double outPower = (angleOutput/180)*(Constants.Swerve.maxAngularVelocity+2.5);
+        if(outPower<=0.8&&outPower>=-0.8){
+            outPower *= 5;
+        }
+        drive(translation, -outPower, fieldRelative, isOpenLoop);
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
@@ -101,6 +114,9 @@ public class Swerve extends SubsystemBase {
     public void zeroGyro(){
         gyro.reset();
         //gyro.setYaw(0); Pigeon
+    }
+    public void gyro180(){
+        gyro.setAngleAdjustment(0);;
     }
 
     public Rotation2d getYaw() {

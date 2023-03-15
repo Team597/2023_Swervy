@@ -18,20 +18,20 @@ public class Rotate180 extends CommandBase {
   private Swerve s_Swerve;    
   private DoubleSupplier translationSup;
   private DoubleSupplier strafeSup;
-  private DoubleSupplier rotationSup;
+  private double rotation;
   private BooleanSupplier robotCentricSup;
   private SlewRateLimiter translateSlew;
   private SlewRateLimiter strafeSlew;
 
   
   /** Creates a new Rotate180. */
-  public Rotate180(Swerve s_Swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, BooleanSupplier robotCentricSup) {
+  public Rotate180(Swerve s_Swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, double rotationSup, BooleanSupplier robotCentricSup) {
       this.s_Swerve = s_Swerve;
       addRequirements(s_Swerve);
 
       this.translationSup = translationSup;
       this.strafeSup = strafeSup;
-      this.rotationSup = rotationSup;
+      this.rotation = rotationSup;
       this.robotCentricSup = robotCentricSup;
 
       translateSlew = new SlewRateLimiter(0.5);
@@ -44,15 +44,14 @@ public class Rotate180 extends CommandBase {
       /* Get Values, Deadband*/
       double translationVal = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.stickDeadband);
       double strafeVal = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.stickDeadband);
-      double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.stickDeadband);
       
       translationVal = translateSlew.calculate(translationVal);
       strafeVal = strafeSlew.calculate(strafeVal);
 
       /* Drive */
-      s_Swerve.drive(
+      s_Swerve.gyroDrive(
           new Translation2d(translationVal, strafeVal).times(Constants.Swerve.maxSpeed), 
-          rotationVal * Constants.Swerve.maxAngularVelocity, 
+          rotation, 
           !robotCentricSup.getAsBoolean(), 
           true
       );

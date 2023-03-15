@@ -27,6 +27,7 @@ public class WristSubystem extends SubsystemBase {
     wristTalon.setSensorPhase(true);
     wristTalon.configReverseSoftLimitEnable(true);
     wristTalon.configReverseSoftLimitThreshold(1024);
+    wristTalon.configClosedloopRamp(0.1);
   }
 
   @Override
@@ -57,13 +58,19 @@ public class WristSubystem extends SubsystemBase {
                   target = Positions.wCubeSubPick;
                 }
                 break;
-      case 4:   if(!isBox){//MID SCORE
+      case 4: if(!isBox){//LOW SCORE
+                  target = Positions.wConeLowScore;
+                } else {
+                  target = Positions.wBoxLowScore;
+                }
+                break;
+      case 5:   if(!isBox){//MID SCORE
                   target = Positions.wConeMidScore;
                 } else {
                   target = Positions.wCubeMidScore;
                 }
                 break;
-      case 5:   if(!isBox){//HIGH SCORE
+      case 6:   if(!isBox){//HIGH SCORE
                   target = Positions.wConeHighScore;
                 } else {
                   target = Positions.wCubeHighScore;
@@ -105,7 +112,7 @@ public class WristSubystem extends SubsystemBase {
     motor.selectProfileSlot(kSlotIdx, kPIDLoopIdx);
     motor.config_kF(kSlotIdx, 0.0, kTimeoutMs);
     motor.config_kP(kSlotIdx, 4.0, kTimeoutMs);
-    motor.config_kI(kSlotIdx, 0.00001, kTimeoutMs);//0.000025
+    motor.config_kI(kSlotIdx, 0.000005, kTimeoutMs);//0.000025
     motor.config_kD(kSlotIdx, 250.0, kTimeoutMs);
 
     /* Set acceleration and vcruise velocity - see documentation */
