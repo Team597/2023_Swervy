@@ -111,8 +111,8 @@ public class WristSubystem extends SubsystemBase {
     /* Set Motion Magic gains in slot0 - see documentation */
     motor.selectProfileSlot(kSlotIdx, kPIDLoopIdx);
     motor.config_kF(kSlotIdx, 0.0, kTimeoutMs);
-    motor.config_kP(kSlotIdx, 4.0, kTimeoutMs);
-    motor.config_kI(kSlotIdx, 0.000005, kTimeoutMs);//0.000025
+    motor.config_kP(kSlotIdx, 2.5, kTimeoutMs);
+    motor.config_kI(kSlotIdx, 0.00002, kTimeoutMs);//0.000005
     motor.config_kD(kSlotIdx, 250.0, kTimeoutMs);
 
     /* Set acceleration and vcruise velocity - see documentation */

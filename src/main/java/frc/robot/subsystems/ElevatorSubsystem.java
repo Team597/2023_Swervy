@@ -6,17 +6,23 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.Elevator;
 import frc.robot.Constants.Positions;
 
 public class ElevatorSubsystem extends SubsystemBase {
   private TalonFX elevatorFX;
+  private PowerDistribution pdh;
 
 
   /** Creates a new ElevatorSubsystem. */
@@ -24,12 +30,22 @@ public class ElevatorSubsystem extends SubsystemBase {
     this.elevatorFX = new TalonFX(Elevator.elevatorID);
     initMotor(elevatorFX);
     elevatorFX.setNeutralMode(NeutralMode.Brake);
+    elevatorFX.configReverseSoftLimitEnable(false);
+    elevatorFX.configReverseSoftLimitThreshold(0);
+    pdh = new PowerDistribution(1, ModuleType.kRev);
+    
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    //double intakeCurrent = pdh.getCurrent(14);
+    //SmartDashboard.putNumber("Elevator Draw", intakeCurrent);
     SmartDashboard.putNumber("Elevator Pos ", elevatorFX.getSelectedSensorPosition());
+    SmartDashboard.putNumber("Elevator Switch", elevatorFX.isRevLimitSwitchClosed());
+    if(elevatorFX.isRevLimitSwitchClosed()==1){
+      elevatorFX.setSelectedSensorPosition(0);
+    }
   }
 
   public void set(double power){
@@ -46,39 +62,46 @@ public class ElevatorSubsystem extends SubsystemBase {
   public void magicset(int pose, Boolean isBox){
     double target = 0.0;
     switch(pose){
-        case 1:   target = Positions.eHome;//GROUND PICK UP
+        case 1:   Constants.Intake.slowIntake = 0;
+                  target = Positions.eHome;//GROUND PICK UP
                   break;
-        case 2:   if(!isBox){ //CONE UPRIGHT GROUD PICK UP
+        case 2:   Constants.Intake.slowIntake = 0;
+                  if(!isBox){ //CONE UPRIGHT GROUD PICK UP
                     target = Positions.eConeGroundPick;
                   } else {
                     target = Positions.eHome;
                   }
                   break;
-        case 3:   if(!isBox){ // DUAL SUBSTATION PICK UP
+        case 3:   Constants.Intake.slowIntake = 0;
+                  if(!isBox){ // DUAL SUBSTATION PICK UP
                     target = Positions.eConeSubPick;
                   } else {
                     target = Positions.eCubeSubPick;
                   }
                   break;
-        case 4:   if(!isBox){//LOW SCORE
+        case 4:  Constants.Intake.slowIntake = 1;
+                 if(!isBox){//LOW SCORE
                     target = Positions.eHome;
                   } else {
                     target = Positions.eHome;
                   }
                   break;
-        case 5:   if(!isBox){//MID SCORE
+        case 5:   Constants.Intake.slowIntake = 1;
+                  if(!isBox){//MID SCORE
                     target = Positions.eMidScore;
                   } else {
                     target = Positions.eHome;
                   }
                   break;
-        case 6:   if(!isBox){//HIGH SCORE
+        case 6:   Constants.Intake.slowIntake = 1;      
+                  if(!isBox){//HIGH SCORE
                     target = Positions.eHighScore;
                   } else {
                     target = Positions.eBoxHighScore;
                   }
                   break;
         default:  target = Positions.eHome;
+                  Constants.Intake.slowIntake = 1;
                   break;
             }
     
@@ -121,6 +144,12 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     /* Zero the sensor once on robot boot up */
     motor.setSelectedSensorPosition(0, kPIDLoopIdx, kTimeoutMs);
+
+
+    motor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(
+      true, 30, 40, 0.2));
+    motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration
+    (true, 35, 40, 0.2));
   }
 
 

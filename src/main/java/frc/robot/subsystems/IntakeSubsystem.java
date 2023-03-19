@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.Intake;
 
 /** Add your docs here. */
@@ -23,19 +24,20 @@ public class IntakeSubsystem extends SubsystemBase{
     private TalonSRX intakeTalon;
     private DoubleSolenoid intakeSolenoid;
     private String mode;
-    private PowerDistribution pdh;
+    //private PowerDistribution pdh;
     private Spark ledBlinky;
+
 
     
     public IntakeSubsystem(){
         this.intakeTalon = new TalonSRX(Intake.intakeID);
         this.intakeSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, Intake.solenoidIn, Intake.solenoidOut);
-        intakeSolenoid.set(Value.kForward);
-        mode = "Cone";
+        intakeSolenoid.set(Value.kReverse);
+        mode = "Box";
         intakeTalon.setNeutralMode(NeutralMode.Brake);
-        pdh = new PowerDistribution(1, ModuleType.kRev);
+        //pdh = new PowerDistribution(1, ModuleType.kRev);
         ledBlinky= new Spark(0);
-        ledBlinky.set(-0.03);//Initialize Green
+        ledBlinky.set(0.17);//Initialize Green
     }
     
     @Override
@@ -45,8 +47,12 @@ public class IntakeSubsystem extends SubsystemBase{
     }
 
     public void driveIntake(double power){
-        double intakeCurrent = pdh.getCurrent(5);
-        SmartDashboard.putNumber("Intake Draw", intakeCurrent);
+        //double intakeCurrent = pdh.getCurrent(5);
+        //SmartDashboard.putNumber("Intake Draw", intakeCurrent);
+        if(Constants.Intake.slowIntake==1 && power > 0){
+            power *= 0.1;
+            
+        }
         intakeTalon.set(ControlMode.PercentOutput, power);
     }
 

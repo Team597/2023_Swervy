@@ -55,8 +55,12 @@ public class RobotContainer {
     private final JoystickButton highScore = new JoystickButton(codriver, XboxController.Button.kY.value);
 
     private final POVButton groundPickup = new POVButton(codriver, 180);
+    private final POVButton pov135 = new POVButton(codriver, 135);
+    private final POVButton pov225 = new POVButton(codriver, 225);
     private final POVButton midPickup1 = new POVButton(codriver, 270);
     private final POVButton midPickup2 = new POVButton(codriver, 90);
+    private final POVButton pov45 = new POVButton(codriver, 45);
+    private final POVButton pov315 = new POVButton(codriver, 315);
     private final POVButton highPickup = new POVButton(codriver, 0);
 
     private final JoystickButton manualWrist = new JoystickButton(codriver, XboxController.Button.kBack.value);
@@ -133,10 +137,22 @@ public class RobotContainer {
         groundPickup.debounce(0.1)
             .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist, () -> s_Intake.isBox(), 1))
             .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
+            pov135.debounce(0.1)
+            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist, () -> s_Intake.isBox(), 1))
+            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
+            pov225.debounce(0.1)
+            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist, () -> s_Intake.isBox(), 1))
+            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
         midPickup1.debounce(0.1)
             .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 2))
             .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
         midPickup2.debounce(0.1)
+            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 2))
+            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
+            pov45.debounce(0.1)
+            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 2))
+            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
+            pov315.debounce(0.1)
             .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 2))
             .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
         highPickup.debounce(0.1)
@@ -164,8 +180,13 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         // An ExampleCommand will run in autonomous
-        return new exampleAuto(s_Swerve);
+        return new exampleAuto(s_Swerve, s_Elevator, s_Wrist,  () -> s_Intake.isBox(), s_Intake);
     }
+
+    public void resetGyro(){
+        s_Swerve.zeroGyro();
+    }
+
 
     public boolean axisRightCheck(){
         return Math.abs(codriver.getRawAxis(3)) > 0.5;
