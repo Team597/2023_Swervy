@@ -5,19 +5,14 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.WristSubystem;
 
-public class DriveIntake extends CommandBase {
-  private IntakeSubsystem intake;
-  private double power;
-
-  /** Creates a new DriveIntake. */
-  public DriveIntake(IntakeSubsystem w_Intake, double w_Power) {
-    // Use addRequirements() here to declare subsystem dependencies.
-    intake = w_Intake;
-    power = w_Power;
-
-    addRequirements(intake);
+public class EmergencyWrist extends CommandBase {
+  private WristSubystem wrist;
+  /** Creates a new EmergencyWrist. */
+  public EmergencyWrist(WristSubystem w_Wrist) {
+    wrist = w_Wrist;
+    addRequirements(wrist);
   }
 
   // Called when the command is initially scheduled.
@@ -27,22 +22,20 @@ public class DriveIntake extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(intake.intakeMode()=="Cube" && power<=0){
-      power *= 0.15;
+    if(!wrist.limitSwitched()){
+      wrist.driveWrist(-0.2);
     }
-    intake.driveIntake(power);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    intake.driveIntake(0);
+    wrist.driveWrist(0);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    //intake.driveIntake(0);
-    return false;
+    return wrist.limitSwitched();
   }
 }

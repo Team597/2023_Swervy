@@ -15,31 +15,31 @@ public final class Constants {
 
 
     public static final class Positions{
-        public static final double wBothGround = 3750;
+        public static final double wBothGround = 4330;
         
         
         public static final double
-            wHome = wBothGround - 1725,//1385
+            wHome = wBothGround - 1700,//1385? 1725 Old Wrist Before Switch
             eHome = 0,
-            wConeGroundPick = wBothGround + 30,
-            eConeGroundPick = 70966,
+            wConeGroundPick = wBothGround + 45,
+            eConeGroundPick = 54950,
 
-            wConeSubPick = wBothGround + 130,//THIS SECTION NEEDS NUMBERS
-            eConeSubPick = 310438,
-            wCubeSubPick = wBothGround + 130,
-            eCubeSubPick = 310438,
+            wConeSubPick = wBothGround + 45,//THIS SECTION NEEDS NUMBERS
+            eConeSubPick = 290525,
+            wCubeSubPick = wBothGround + 45,
+            eCubeSubPick = 290525,
 
             wConeLowScore = wBothGround - 350,
             wBoxLowScore = wBothGround - 250,
 
-            wConeMidScore = wBothGround - 440,
+            wConeMidScore = wBothGround - 300,
             wCubeMidScore = wBothGround - 1220,
-            eMidScore = 231000,
+            eMidScore = 178630,
             
-            wConeHighScore = wBothGround - 340,
-            wCubeHighScore = wBothGround - 1220,
-            eBoxHighScore = 139300,
-            eHighScore = 331300;
+            wConeHighScore = wBothGround - 300,
+            wCubeHighScore = wBothGround - 1050,
+            eBoxHighScore = 121200,//139300
+            eHighScore = 264150;//331300
             
     }
     
@@ -54,6 +54,7 @@ public final class Constants {
     }
     public static final class Elevator{
         public static final int elevatorID = 21;
+        public static boolean scoring = false;
     }
 
     public static final class Swerve {

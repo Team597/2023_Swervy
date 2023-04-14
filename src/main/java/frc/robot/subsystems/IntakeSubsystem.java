@@ -6,13 +6,12 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -38,6 +37,10 @@ public class IntakeSubsystem extends SubsystemBase{
         //pdh = new PowerDistribution(1, ModuleType.kRev);
         ledBlinky= new Spark(0);
         ledBlinky.set(0.17);//Initialize Green
+        intakeTalon.setStatusFramePeriod(StatusFrame.Status_4_AinTempVbat,5000);
+        intakeTalon.setStatusFramePeriod(StatusFrame.Status_1_General,5000);
+        //elevatorFX.setStatusFramePeriod(StatusFrame.Status_10_MotionMagic,5000);
+        intakeTalon.setStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1,5000);
     }
     
     @Override

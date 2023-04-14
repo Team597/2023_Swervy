@@ -23,10 +23,12 @@ public class Swerve extends SubsystemBase {
     public SwerveDriveOdometry swerveOdometry;
     public SwerveModule[] mSwerveMods;
     public AHRS gyro;
+    public double groundPitch;
 
     public Swerve() {
         gyro = new AHRS(Port.kMXP); 
         zeroGyro();
+        groundPitch = gyro.getPitch();
 
         mSwerveMods = new SwerveModule[] {
             new SwerveModule(0, Constants.Swerve.Mod0.constants),
@@ -115,6 +117,14 @@ public class Swerve extends SubsystemBase {
         gyro.reset();
     }
 
+    public double getPitch(){
+        return gyro.getPitch();
+    }
+
+    public void setPitch(){
+        groundPitch = gyro.getPitch();
+    }
+
     public Rotation2d getYaw() {
         return gyro.getRotation2d();
         //return (Constants.Swerve.invertGyro) ? Rotation2d.fromDegrees(360 - gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
@@ -129,6 +139,7 @@ public class Swerve extends SubsystemBase {
     @Override
     public void periodic(){
         SmartDashboard.putNumber("Gyro ", gyro.getAngle());
+        SmartDashboard.putNumber("Pitch", gyro.getPitch());
         swerveOdometry.update(getYaw(), getModulePositions());  
 
         for(SwerveModule mod : mSwerveMods){

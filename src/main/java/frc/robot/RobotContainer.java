@@ -1,13 +1,15 @@
 package frc.robot;
 
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
-import frc.robot.Constants.Positions;
 import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -73,6 +75,12 @@ public class RobotContainer {
     private final WristSubystem s_Wrist = new WristSubystem();
     private final Limelight s_Limelight = new Limelight();
 
+    /* Autonomouses */
+    private final Command w_SimpleAuto = new ShootAndDriveBack(s_Swerve, s_Elevator, s_Wrist,  () -> s_Intake.isBox(), s_Intake);
+    private final Command w_BalanceAuto = new ShootAndBalance(s_Swerve, s_Elevator, s_Wrist,  () -> s_Intake.isBox(), s_Intake);
+    private final Command w_JustScore = new JustShoot(s_Swerve, s_Elevator, s_Wrist,  () -> s_Intake.isBox(), s_Intake);
+
+    SendableChooser<Command> w_Chooser = new SendableChooser<>();
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
@@ -92,6 +100,13 @@ public class RobotContainer {
 
         // Configure the button bindings
         configureButtonBindings();
+
+        //Add Autos
+        w_Chooser.setDefaultOption("Shoot and Drive Back", w_SimpleAuto);
+        w_Chooser.addOption("Shoot and Balance", w_BalanceAuto);
+        w_Chooser.addOption("Just Shoot", w_JustScore);
+
+        SmartDashboard.putData(w_Chooser);
     }
 
     /**
@@ -103,7 +118,7 @@ public class RobotContainer {
     private void configureButtonBindings() {
         /* Driver Buttons */
         zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
-        limeButton.whileTrue(new LimeDrive(s_Limelight, s_Swerve));
+       /*  limeButton.whileTrue(new LimeDrive(s_Limelight, s_Swerve));
         limeButton.onFalse(new TeleopSwerve(
             s_Swerve, 
             () -> -driver.getRawAxis(translationAxis), 
@@ -121,12 +136,15 @@ public class RobotContainer {
          () -> -driver.getRawAxis(translationAxis),
          () -> -driver.getRawAxis(strafeAxis),
          180,
-         () -> robotCentric.getAsBoolean()));
+         () -> robotCentric.getAsBoolean()));*/
        
 
         /* CoDriver Buttons */
-        manualWrist.onTrue(new DriveWrist(s_Wrist, () -> -codriver.getRawAxis(wristAxis)));
-        manualElevator.onTrue(new DriveElevator(s_Elevator, () -> -codriver.getRawAxis(eleAxis)));
+        //manualWrist.onTrue(new IncreaseWrist(s_Wrist, () -> -codriver.getRawAxis(wristAxis)));
+        //manualElevator.onTrue(new IncreaseElevator(s_Elevator, () -> -codriver.getRawAxis(eleAxis)));
+
+        manualElevator.or(manualWrist).onTrue(new EmergencyWrist(s_Wrist));
+
 
         intakePiece.whileTrue(new DriveIntake(s_Intake,1.0));
         outtakePiece.whileTrue(new DriveIntake(s_Intake,-1.0));
@@ -134,28 +152,28 @@ public class RobotContainer {
         coneMode.onTrue(new IntakeSolenoid(s_Intake, true));
         cubeMode.onTrue(new IntakeSolenoid(s_Intake, false));
 
-        groundPickup.debounce(0.1)
+        groundPickup.or(pov135).or(pov225).debounce(0.1, DebounceType.kBoth)
             .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist, () -> s_Intake.isBox(), 1))
             .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
-            pov135.debounce(0.1)
+           /*  pov135.debounce(0.1, DebounceType.kBoth)
             .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist, () -> s_Intake.isBox(), 1))
             .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
-            pov225.debounce(0.1)
+            pov225.debounce(0.1, DebounceType.kBoth)
             .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist, () -> s_Intake.isBox(), 1))
-            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
-        midPickup1.debounce(0.1)
+            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));*/
+        midPickup1.debounce(0.1, DebounceType.kBoth).or(pov315)
             .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 2))
             .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
-        midPickup2.debounce(0.1)
+        midPickup2.debounce(0.1, DebounceType.kBoth).or(pov45)
             .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 2))
             .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
-            pov45.debounce(0.1)
+            /*pov45.debounce(0.1, DebounceType.kBoth)
             .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 2))
             .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
-            pov315.debounce(0.1)
+            pov315.debounce(0.1, DebounceType.kBoth)
             .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 2))
-            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
-        highPickup.debounce(0.1)
+            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));*/
+        highPickup.debounce(0.1, DebounceType.kBoth)
             .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 3))
             .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
 
@@ -180,11 +198,15 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         // An ExampleCommand will run in autonomous
-        return new exampleAuto(s_Swerve, s_Elevator, s_Wrist,  () -> s_Intake.isBox(), s_Intake);
+        //return new AutoBalance(s_Swerve);
+        return w_Chooser.getSelected();
     }
 
     public void resetGyro(){
         s_Swerve.zeroGyro();
+    }
+    public void setPitch(){
+        s_Swerve.setPitch();
     }
 
 

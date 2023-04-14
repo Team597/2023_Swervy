@@ -3,7 +3,6 @@ package frc.robot.autos;
 import frc.robot.Constants;
 import frc.robot.commands.DriveIntake;
 import frc.robot.commands.ElevatorAndWrist;
-import frc.robot.commands.IntakeSolenoid;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.Swerve;
@@ -11,7 +10,6 @@ import frc.robot.subsystems.WristSubystem;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -29,10 +27,9 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-public class exampleAuto extends SequentialCommandGroup {
-    public exampleAuto(Swerve s_Swerve, ElevatorSubsystem s_Elevator, WristSubystem s_Wrist, BooleanSupplier isBox, IntakeSubsystem s_Intake){
+public class ShootAndDriveBack extends SequentialCommandGroup {
+    public ShootAndDriveBack(Swerve s_Swerve, ElevatorSubsystem s_Elevator, WristSubystem s_Wrist, BooleanSupplier isBox, IntakeSubsystem s_Intake){
         s_Swerve.zeroGyro();
         TrajectoryConfig config =
             new TrajectoryConfig(
@@ -82,8 +79,8 @@ public class exampleAuto extends SequentialCommandGroup {
 
 
         addCommands(
-            new ElevatorAndWrist(s_Elevator, s_Wrist, isBox, 4).withTimeout(1.5),
-            new DriveIntake(s_Intake, -1.0).withTimeout(0.5),
+            new ElevatorAndWrist(s_Elevator, s_Wrist, isBox, 6).withTimeout(2.5),
+            new DriveIntake(s_Intake, -0.76).withTimeout(0.5),
             new ElevatorAndWrist(s_Elevator, s_Wrist, isBox, 0).withTimeout(1.5),
             new DriveIntake(s_Intake, 0).withTimeout(0.5),
             new InstantCommand(() -> s_Swerve.resetOdometry(exampleTrajectory.getInitialPose())),
