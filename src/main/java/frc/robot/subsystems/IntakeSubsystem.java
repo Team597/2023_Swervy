@@ -36,7 +36,7 @@ public class IntakeSubsystem extends SubsystemBase{
         intakeTalon.setNeutralMode(NeutralMode.Brake);
         //pdh = new PowerDistribution(1, ModuleType.kRev);
         ledBlinky= new Spark(0);
-        ledBlinky.set(0.17);//Initialize Green
+        blinky(1);
         intakeTalon.setStatusFramePeriod(StatusFrame.Status_4_AinTempVbat,5000);
         intakeTalon.setStatusFramePeriod(StatusFrame.Status_1_General,5000);
         //elevatorFX.setStatusFramePeriod(StatusFrame.Status_10_MotionMagic,5000);
@@ -63,13 +63,25 @@ public class IntakeSubsystem extends SubsystemBase{
         if(dir){
             intakeSolenoid.set(Value.kForward);
             mode = "Cone";
-            ledBlinky.set(-0.03);
+            blinky(2);
         }else{
             intakeSolenoid.set(Value.kReverse);
             mode = "Box";
-            ledBlinky.set(0.17);
+            blinky(1);
         }
     }
+
+    public void blinky(int casa){
+        switch(casa){
+            case 1: ledBlinky.set(0.17); //Box 
+            break;
+            case 2: ledBlinky.set(-0.03); //Cone
+            break;
+            case 3: ledBlinky.set(0.15); //Dual Station Cone
+            break;
+        }
+    }
+
 
     public boolean isBox(){
         if (mode=="Cone"){

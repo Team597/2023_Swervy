@@ -11,13 +11,13 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Swerve;
 
-public class AutoBalance extends CommandBase {
+public class AutoPowerBalance extends CommandBase {
   /** Creates a new AutoBalance. */
   private final Swerve swerve;
-  PIDController outputCalc = new PIDController(0.0095, 0.0, 0.0);//0.0095, 0.0, 0.0
+  PIDController outputCalc = new PIDController(0.012, 0.0, 0.0);//0.0095, 0.0, 0.0
 
 
-  public AutoBalance(Swerve w_Swerve) {
+  public AutoPowerBalance(Swerve w_Swerve) {
     swerve = w_Swerve;
     addRequirements(swerve);
   }
@@ -40,12 +40,13 @@ public class AutoBalance extends CommandBase {
     if(Math.abs(swerve.getPitch())>2.0){
       /* Drive */
       swerve.gyroDrive(
-          new Translation2d(outputPID, 0).times(Constants.Swerve.maxSpeed-0.5), 
+          new Translation2d(outputPID, 0).times(Constants.Swerve.maxSpeed), 
           0, 
           true, 
           true
       );
     }else{
+      System.out.println("balance");
       swerve.gyroDrive(
           new Translation2d(0, 0).times(Constants.Swerve.maxSpeed), 
           0, 
@@ -53,6 +54,7 @@ public class AutoBalance extends CommandBase {
           true
       );
     }
+    //System.out.println("Driving: " + outputPID + "Gyro: " + swerve.getPitch());
   }
 
   // Called once the command ends or is interrupted.
@@ -62,7 +64,7 @@ public class AutoBalance extends CommandBase {
     0, 
     true, 
     true);
-    System.out.println("ENDDDDDDDDD");
+    System.out.println("endededed");
   }
 
   // Returns true when the command should end.

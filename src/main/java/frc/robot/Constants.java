@@ -35,6 +35,8 @@ public final class Constants {
             wConeMidScore = wBothGround - 300,
             wCubeMidScore = wBothGround - 1220,
             eMidScore = 178630,
+
+            wSingleSub = wBothGround - 1260,
             
             wConeHighScore = wBothGround - 300,
             wCubeHighScore = wBothGround - 1050,
@@ -124,7 +126,7 @@ public final class Constants {
 
         /* Swerve Profiling Values */
         /** Meters per Second */
-        public static final double maxSpeed = 4.5; //TODO: This must be tuned to specific robot Default 4.5 LA 4.0
+        public static final double maxSpeed = 5.5; //TODO: This must be tuned to specific robot Default 4.5 LA 4.0
         /** Radians per Second */
         public static final double maxAngularVelocity = 9.5; //TODO: This must be tuned to specific robot Default 10.0 LA 8.5
 
@@ -183,6 +185,9 @@ public final class Constants {
         public static final double kPXController = 0.1;
         public static final double kPYController = 0.1;
         public static final double kPThetaController = 0.2;
+
+
+        public static final double ScorePower = -0.76;
     
         /* Constraint for the motion profilied robot angle controller */
         public static final TrapezoidProfile.Constraints kThetaControllerConstraints =

@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.lang.ModuleLayer.Controller;
+
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -7,6 +9,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -45,7 +48,26 @@ public class RobotContainer {
 
 
     /* Co-Driver Buttons */
-    private final GamepadAxisButton intakePiece = new GamepadAxisButton(this::axisLeftCheck);
+    
+    private final JoystickButton intakePiece = new JoystickButton(codriver,7);
+    private final JoystickButton outtakePiece = new JoystickButton(codriver,8);
+
+    private final JoystickButton coneMode = new JoystickButton(codriver,5);
+    private final JoystickButton cubeMode = new JoystickButton(codriver, 6);
+
+    private final JoystickButton lowScore = new JoystickButton(codriver, 2);
+    private final JoystickButton midScore1 = new JoystickButton(codriver, 1);
+    private final JoystickButton midScore2 = new JoystickButton(codriver, 3);
+    private final JoystickButton highScore = new JoystickButton(codriver,4);
+
+    private final JoystickButton dualLED = new JoystickButton(codriver, 10);
+
+    private final JoystickButton singleSub = new JoystickButton(codriver, 9);
+
+    private final JoystickButton manualWrist = new JoystickButton(codriver, 14);
+    private final JoystickButton manualElevator = new JoystickButton(codriver, 13);
+    
+    /*private final GamepadAxisButton intakePiece = new GamepadAxisButton(this::axisLeftCheck);
     private final GamepadAxisButton outtakePiece = new GamepadAxisButton(this::axisRightCheck);
 
     private final JoystickButton coneMode = new JoystickButton(codriver, XboxController.Button.kLeftBumper.value);
@@ -55,6 +77,10 @@ public class RobotContainer {
     private final JoystickButton midScore1 = new JoystickButton(codriver, XboxController.Button.kB.value);
     private final JoystickButton midScore2 = new JoystickButton(codriver, XboxController.Button.kX.value);
     private final JoystickButton highScore = new JoystickButton(codriver, XboxController.Button.kY.value);
+    
+    private final JoystickButton manualWrist = new JoystickButton(codriver, XboxController.Button.kBack.value);
+    private final JoystickButton manualElevator = new JoystickButton(codriver, XboxController.Button.kStart.value);
+    */
 
     private final POVButton groundPickup = new POVButton(codriver, 180);
     private final POVButton pov135 = new POVButton(codriver, 135);
@@ -65,8 +91,6 @@ public class RobotContainer {
     private final POVButton pov315 = new POVButton(codriver, 315);
     private final POVButton highPickup = new POVButton(codriver, 0);
 
-    private final JoystickButton manualWrist = new JoystickButton(codriver, XboxController.Button.kBack.value);
-    private final JoystickButton manualElevator = new JoystickButton(codriver, XboxController.Button.kStart.value);
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
@@ -78,7 +102,10 @@ public class RobotContainer {
     /* Autonomouses */
     private final Command w_SimpleAuto = new ShootAndDriveBack(s_Swerve, s_Elevator, s_Wrist,  () -> s_Intake.isBox(), s_Intake);
     private final Command w_BalanceAuto = new ShootAndBalance(s_Swerve, s_Elevator, s_Wrist,  () -> s_Intake.isBox(), s_Intake);
+    private final Command w_CrossBalanceAuto = new ShootAndCrossBalance(s_Swerve, s_Elevator, s_Wrist,  () -> s_Intake.isBox(), s_Intake);
     private final Command w_JustScore = new JustShoot(s_Swerve, s_Elevator, s_Wrist,  () -> s_Intake.isBox(), s_Intake);
+    private final Command w_PiroutteAuto = new ShootAndSpinDrive(s_Swerve, s_Elevator, s_Wrist,  () -> s_Intake.isBox(), s_Intake);
+    
 
     SendableChooser<Command> w_Chooser = new SendableChooser<>();
 
@@ -104,6 +131,8 @@ public class RobotContainer {
         //Add Autos
         w_Chooser.setDefaultOption("Shoot and Drive Back", w_SimpleAuto);
         w_Chooser.addOption("Shoot and Balance", w_BalanceAuto);
+        w_Chooser.addOption("Shoot then CROSS Balance", w_CrossBalanceAuto);
+        w_Chooser.addOption("Shoot and Dance", w_PiroutteAuto);
         w_Chooser.addOption("Just Shoot", w_JustScore);
 
         SmartDashboard.putData(w_Chooser);
@@ -145,6 +174,7 @@ public class RobotContainer {
 
         manualElevator.or(manualWrist).onTrue(new EmergencyWrist(s_Wrist));
 
+        dualLED.onTrue(new DualBlink(s_Intake));
 
         intakePiece.whileTrue(new DriveIntake(s_Intake,1.0));
         outtakePiece.whileTrue(new DriveIntake(s_Intake,-1.0));
@@ -155,24 +185,12 @@ public class RobotContainer {
         groundPickup.or(pov135).or(pov225).debounce(0.1, DebounceType.kBoth)
             .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist, () -> s_Intake.isBox(), 1))
             .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
-           /*  pov135.debounce(0.1, DebounceType.kBoth)
-            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist, () -> s_Intake.isBox(), 1))
-            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
-            pov225.debounce(0.1, DebounceType.kBoth)
-            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist, () -> s_Intake.isBox(), 1))
-            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));*/
         midPickup1.debounce(0.1, DebounceType.kBoth).or(pov315)
             .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 2))
             .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
         midPickup2.debounce(0.1, DebounceType.kBoth).or(pov45)
             .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 2))
             .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
-            /*pov45.debounce(0.1, DebounceType.kBoth)
-            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 2))
-            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
-            pov315.debounce(0.1, DebounceType.kBoth)
-            .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 2))
-            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));*/
         highPickup.debounce(0.1, DebounceType.kBoth)
             .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 3))
             .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
@@ -189,7 +207,9 @@ public class RobotContainer {
         highScore.debounce(0.1)
             .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 6))
             .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));
-    }
+        singleSub.debounce(0.1)
+           .whileTrue(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 7))
+            .onFalse(new ElevatorAndWrist(s_Elevator, s_Wrist,  () -> s_Intake.isBox(), 0));    }
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.

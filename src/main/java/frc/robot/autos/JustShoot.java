@@ -80,7 +80,7 @@ public class JustShoot extends SequentialCommandGroup {
 
         addCommands(
             new ElevatorAndWrist(s_Elevator, s_Wrist, isBox, 6).withTimeout(2.5),
-            new DriveIntake(s_Intake, -1.0).withTimeout(0.5),
+            new DriveIntake(s_Intake, Constants.AutoConstants.ScorePower).withTimeout(0.5),
             new ElevatorAndWrist(s_Elevator, s_Wrist, isBox, 0).withTimeout(1.5),
             new DriveIntake(s_Intake, 0).withTimeout(0.5)
         );

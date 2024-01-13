@@ -11,10 +11,6 @@ import frc.robot.subsystems.WristSubystem;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -25,11 +21,12 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 
-public class ShootAndDriveBack extends SequentialCommandGroup {
-    public ShootAndDriveBack(Swerve s_Swerve, ElevatorSubsystem s_Elevator, WristSubystem s_Wrist, BooleanSupplier isBox, IntakeSubsystem s_Intake){
+public class ShootAndSpinDrive extends SequentialCommandGroup {
+    public ShootAndSpinDrive(Swerve s_Swerve, ElevatorSubsystem s_Elevator, WristSubystem s_Wrist, BooleanSupplier isBox, IntakeSubsystem s_Intake){
         s_Swerve.zeroGyro();
         TrajectoryConfig config =
             new TrajectoryConfig(
@@ -46,7 +43,7 @@ public class ShootAndDriveBack extends SequentialCommandGroup {
                 // Pass through these two interior waypoints, making an 's' curve path
                 List.of(new Translation2d(2, 0)),
                 // End 3 meters straight ahead of where we started, facing forward
-                new Pose2d(5.5, 0, new Rotation2d(0)),
+                new Pose2d(4.5, 0, new Rotation2d(0)),
                 config);
 
         var thetaController =
@@ -65,26 +62,20 @@ public class ShootAndDriveBack extends SequentialCommandGroup {
                 thetaController,
                 s_Swerve::setModuleStates,
                 s_Swerve);
-       /*  PPSwerveControllerCommand swerveControllerCommand = //new PPSwerveControllerCommand(newExample, s_Swerve::getPose, new PIDController(Constants.AutoConstants.kPXController, 0, 0), new PIDController(Constants.AutoConstants.kPYController, 0, 0), null, null, null) ; 
-             new PPSwerveControllerCommand(
-                newExample,
-                s_Swerve::getPose,
-                Constants.Swerve.swerveKinematics,
-                new PIDController(Constants.AutoConstants.kPXController, 0, 0),
-                new PIDController(Constants.AutoConstants.kPYController, 0, 0),
-                new PIDController(Constants.AutoConstants.kPThetaController, 0, 0),
-                s_Swerve::setModuleStates,
-                true,
-                s_Swerve);*/
 
 
         addCommands(
-            new ElevatorAndWrist(s_Elevator, s_Wrist, isBox, 6).withTimeout(2.5),
-            new DriveIntake(s_Intake, Constants.AutoConstants.ScorePower).withTimeout(0.5),
-            new ElevatorAndWrist(s_Elevator, s_Wrist, isBox, 0).withTimeout(1.5),
-            new DriveIntake(s_Intake, 0).withTimeout(0.5),
+            new ElevatorAndWrist(s_Elevator, s_Wrist, isBox, 6).withTimeout(1.75),
+            new DriveIntake(s_Intake, Constants.AutoConstants.ScorePower).withTimeout(0.15),
+            new ElevatorAndWrist(s_Elevator, s_Wrist, isBox, 0).withTimeout(0.5),
+            new DriveIntake(s_Intake, 0).withTimeout(0.05),
             new InstantCommand(() -> s_Swerve.resetOdometry(exampleTrajectory.getInitialPose())),
-            swerveControllerCommand
+            swerveControllerCommand,
+            new AutoGyroDrive(s_Swerve, 0, 0, 180).withTimeout(1),
+            new ParallelCommandGroup(new AutoGyroDrive(s_Swerve, 0.3, 0, 180), new ElevatorAndWrist(s_Elevator, s_Wrist, isBox, 1), new DriveIntake(s_Intake, 1)).withTimeout(1.5),
+            new ParallelCommandGroup(new AutoGyroDrive(s_Swerve, -0.3, 0, 0), new ElevatorAndWrist(s_Elevator, s_Wrist, isBox, 0), new DriveIntake(s_Intake, 1)).withTimeout(2.0),
+            new ElevatorAndWrist(s_Elevator, s_Wrist, isBox, 4).withTimeout(0.75),
+            new DriveIntake(s_Intake, -1.0).withTimeout(0.15)
         );
     }
 }

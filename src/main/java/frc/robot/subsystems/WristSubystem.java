@@ -76,7 +76,7 @@ public class WristSubystem extends SubsystemBase {
       case 2:   if(!isBox){ //CONE UPRIGHT GROUD PICK UP
                   target = Positions.wConeGroundPick;
                 } else {
-                  target = Positions.wBothGround;
+                  target = Positions.wConeGroundPick;//Box default wBothGround
                 }
                 break;
       case 3:   if(!isBox){ // DUAL SUBSTATION PICK UP
@@ -103,6 +103,9 @@ public class WristSubystem extends SubsystemBase {
                   target = Positions.wCubeHighScore;
                 }
                 break;
+      case 7:   target = Positions.wSingleSub;
+                break;
+                
       default:  target = Positions.wHome;
                 break;
     }

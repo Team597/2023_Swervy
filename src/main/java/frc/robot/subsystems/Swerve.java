@@ -24,6 +24,7 @@ public class Swerve extends SubsystemBase {
     public SwerveModule[] mSwerveMods;
     public AHRS gyro;
     public double groundPitch;
+    public double starterX;
 
     public Swerve() {
         gyro = new AHRS(Port.kMXP); 
@@ -44,6 +45,7 @@ public class Swerve extends SubsystemBase {
         resetModulesToAbsolute();
 
         swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getYaw(), getModulePositions());
+        setDriftedX();
     }
 
     public void gyroDrive(Translation2d translation, double desiredRotation, boolean fieldRelative, boolean isOpenLoop){
@@ -127,9 +129,21 @@ public class Swerve extends SubsystemBase {
 
     public Rotation2d getYaw() {
         return gyro.getRotation2d();
-        //return (Constants.Swerve.invertGyro) ? Rotation2d.fromDegrees(360 - gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
     }
 
+    public double getDriftedX(){
+        return gyro.getDisplacementZ();
+    }
+
+    public void setDriftedX(){
+        starterX = gyro.getDisplacementZ();
+    }
+
+    public double DriftedDifference(){
+        double zewo = 0.0;
+        zewo = starterX - getDriftedX();
+        return zewo;
+    }
     public void resetModulesToAbsolute(){
         for(SwerveModule mod : mSwerveMods){
             mod.resetToAbsolute();
@@ -141,6 +155,9 @@ public class Swerve extends SubsystemBase {
         SmartDashboard.putNumber("Gyro ", gyro.getAngle());
         SmartDashboard.putNumber("Pitch", gyro.getPitch());
         swerveOdometry.update(getYaw(), getModulePositions());  
+        SmartDashboard.putNumber("Quad Z", gyro.getDisplacementZ());
+        SmartDashboard.putNumber("Quad Set", starterX);
+        SmartDashboard.putNumber("Quad Diff", DriftedDifference());
 
         for(SwerveModule mod : mSwerveMods){
             int fakeNum = mod.moduleNumber + 1;

@@ -6,10 +6,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
@@ -83,7 +81,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                   if(!isBox){ //CONE UPRIGHT GROUD PICK UP
                     target = Positions.eConeGroundPick;
                   } else {
-                    target = Positions.eHome;
+                    target = Positions.eConeGroundPick;//BOXES Default Home
                   }
                   break;
         case 3:   Constants.Intake.slowIntake = 0;
@@ -118,6 +116,11 @@ public class ElevatorSubsystem extends SubsystemBase {
                     target = Positions.eBoxHighScore;
                   }
                   break;
+        case 7:  Constants.Intake.slowIntake = 0;
+                 Constants.Elevator.scoring = false;
+                 target = Positions.eHome;
+                 break;
+
         default:  target = Positions.eHome;
                   Constants.Intake.slowIntake = 1;
                   Constants.Elevator.scoring = false;
